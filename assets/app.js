@@ -59,6 +59,41 @@ function toTelPhone(value) {
   return value || "";
 }
 
+function resolveRecordValue(record, keys) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return "";
+}
+
+function buildDynamicPractices(record, fallbackItems) {
+  const rawValue = resolveRecordValue(record, [
+    "practices",
+    "practiceList",
+    "practice",
+  ]);
+
+  if (!rawValue) {
+    return fallbackItems;
+  }
+
+  const practiceList = rawValue
+    .split(";")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => {
+      const [en = "", zh = ""] = item.split(",").map((part) => part.trim());
+      return { en, zh };
+    })
+    .filter((item) => item.en || item.zh);
+
+  return practiceList.length ? practiceList : fallbackItems;
+}
+
 createApp({
   data() {
     return {
@@ -74,7 +109,6 @@ createApp({
         name: "",
         title: "",
         instagram: "",
-        instagramLabel: "",
         phone: "",
         email: "",
         website: "",
@@ -220,12 +254,22 @@ createApp({
       return toTelPhone(value);
     },
     applyCardData(record) {
+      const unifiedNumber = resolveRecordValue(record, [
+        "unifiedNumber",
+        "taxId",
+        "businessNumber",
+        "companyTaxId",
+      ]);
+      const address = resolveRecordValue(record, [
+        "address",
+        "companyAddress",
+      ]);
+
       this.person = {
         ...this.person,
         name: record.name || "",
         title: record.title || "",
         instagram: record.instagram || "",
-        instagramLabel: record.instagramLabel || "",
         phone: formatPhone(record.phone || ""),
         email: record.email || "",
         website: record.website || "",
@@ -235,6 +279,7 @@ createApp({
         ...this.company,
         title: record.companyTitle || "",
         subtitle: record.companySubtitle || "",
+        practices: buildDynamicPractices(record, this.company.practices),
         introParagraphs: [record.intro1, record.intro2].filter(Boolean).length
           ? [record.intro1, record.intro2].filter(Boolean)
           : [],
@@ -261,17 +306,31 @@ createApp({
             };
           }
 
-          if (item.label === "Email") {
-            const email = record.email || "";
-            return {
-              ...item,
-              value: email,
-              href: email ? `mailto:${email}` : "",
-            };
-          }
+            if (item.label === "Email") {
+              const email = record.email || "";
+              return {
+                ...item,
+                value: email,
+                href: email ? `mailto:${email}` : "",
+              };
+            }
 
-          return item;
-        }),
+            if (item.label === "統一編號") {
+              return {
+                ...item,
+                value: unifiedNumber,
+              };
+            }
+
+            if (item.label === "Address") {
+              return {
+                ...item,
+                value: address,
+              };
+            }
+
+            return item;
+          }),
       };
 
       if (isUsableUrl(record.portraitUrl)) {
@@ -376,7 +435,7 @@ createApp({
 
                 <div class="contact-row contact-row--social">
                   <p class="contact-instagram">{{ person.instagram }}</p>
-                  <p class="contact-label">{{ person.instagramLabel }}</p>
+                  <p class="contact-label">IG</p>
                 </div>
 
                 <a class="contact-link contact-link--phone" :href="'tel:' + toTelPhone(person.phone)">
