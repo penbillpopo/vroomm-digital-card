@@ -1,0 +1,457 @@
+@font-face {
+  font-family: "Outfit";
+  src: url("./fonts/Outfit-Light.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("./fonts/Outfit-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  --page-bg: #d9d9d9;
+  --text: #000000;
+  --design-width: 1180px;
+  --design-height: 2556px;
+  --app-height: 100vh;
+  --slide-transition: 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: "Outfit", sans-serif;
+}
+
+a,
+button {
+  color: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+figure {
+  margin: 0;
+}
+
+#app {
+  height: 100%;
+}
+
+.page-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  min-height: 100vh;
+  min-height: var(--app-height);
+  height: 100vh;
+  height: 100dvh;
+  background: var(--page-bg);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.loading-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--page-bg);
+}
+
+.loading-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 52px;
+  width: min(74vw, 760px);
+}
+
+.loading-symbol {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.loading-wordmark {
+  display: block;
+  width: min(52vw, 360px);
+  height: auto;
+}
+
+.loader-fade-enter-active,
+.loader-fade-leave-active {
+  transition: opacity 420ms ease;
+}
+
+.loader-fade-enter-from,
+.loader-fade-leave-to {
+  opacity: 0;
+}
+
+.stage-frame {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.design-canvas {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: var(--design-width);
+  height: var(--design-height);
+  transform-origin: top left;
+  background: var(--page-bg);
+}
+
+.design-canvas--slider {
+  overflow: hidden;
+}
+
+.slider-track {
+  width: 100%;
+  height: calc(var(--design-height) * 2);
+}
+
+.slider-track.is-animating {
+  transition: transform var(--slide-transition);
+}
+
+.panel {
+  position: relative;
+  width: var(--design-width);
+  height: var(--design-height);
+  background: var(--page-bg);
+}
+
+.brand-symbol {
+  position: absolute;
+  top: 58px;
+  left: 95px;
+  width: 990px;
+  height: 427px;
+  display: block;
+}
+
+.brand-copy {
+  position: absolute;
+  top: 594px;
+  left: 190px;
+  width: 720px;
+}
+
+.brand-title {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-size: 70px;
+  font-weight: 500;
+  line-height: 50px;
+  letter-spacing: 0;
+}
+
+.brand-subtitle {
+  margin-top: 47px;
+  width: 720px;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 36px;
+}
+
+.portrait-frame {
+  position: absolute;
+  top: 918px;
+  left: 190px;
+  width: 800px;
+  height: 800px;
+  overflow: hidden;
+  background: #f7f7f4;
+}
+
+.portrait-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-block {
+  position: absolute;
+  top: 1854px;
+  left: 190px;
+  width: 800px;
+  height: 507px;
+}
+
+.contact-row {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+.contact-row--name {
+  top: 0;
+  height: 67px;
+}
+
+.contact-row--social {
+  top: 110px;
+  height: 67px;
+}
+
+.contact-name,
+.contact-instagram,
+.contact-link {
+  font-size: 70px;
+  font-weight: 500;
+  line-height: 53px;
+  white-space: nowrap;
+}
+
+.contact-name {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  max-width: 520px;
+}
+
+.contact-role {
+  position: absolute;
+  top: 25px;
+  left: 573px;
+  width: 227px;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 36px;
+}
+
+.contact-instagram {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  max-width: 520px;
+}
+
+.contact-label {
+  position: absolute;
+  top: 23px;
+  left: 573px;
+  width: 227px;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 36px;
+  text-align: right;
+}
+
+.contact-link {
+  position: absolute;
+  left: 0;
+  display: block;
+}
+
+.contact-link--phone {
+  top: 220px;
+  width: 651px;
+}
+
+.contact-link--email {
+  top: 330px;
+  width: 723px;
+}
+
+.contact-link--website {
+  top: 440px;
+  width: 723px;
+}
+
+.slide-arrow {
+  position: absolute;
+  left: 565px;
+  bottom: 62px;
+  width: 50px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slide-arrow img {
+  display: block;
+  width: 50px;
+  height: 26px;
+}
+
+.slide-arrow--up {
+  bottom: 40px;
+}
+
+.slide-arrow--up img {
+  transform: rotate(180deg);
+}
+
+.brand-mark {
+  position: absolute;
+  top: 190px;
+  left: 72px;
+  width: 1035px;
+  height: auto;
+  display: block;
+}
+
+.about-hero {
+  position: absolute;
+  top: 605px;
+  left: 230px;
+  width: 720px;
+  text-align: center;
+}
+
+.about-title {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 48px;
+}
+
+.about-subtitle {
+  margin-top: 15px;
+  font-size: 29px;
+  font-weight: 300;
+  line-height: 35px;
+  letter-spacing: 2.9px;
+}
+
+.about-section {
+  position: absolute;
+  left: 225px;
+  width: 731px;
+}
+
+.about-section--intro {
+  top: 839px;
+}
+
+.about-section--practice {
+  top: 1224px;
+}
+
+.about-section--contact {
+  top: 1769px;
+}
+
+.section-heading h3 {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 48px;
+  letter-spacing: 4px;
+}
+
+.section-rule {
+  width: 729px;
+  height: 1px;
+  margin-top: 32px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.section-copy {
+  margin-top: 29px;
+  width: 731px;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 50px;
+  letter-spacing: 4.8px;
+}
+
+.section-copy p + p {
+  margin-top: 15px;
+}
+
+.practice-grid {
+  margin-top: 30px;
+  width: 731px;
+}
+
+.practice-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 65px;
+}
+
+.practice-en,
+.practice-zh {
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 50px;
+  letter-spacing: 4.8px;
+}
+
+.practice-en {
+  width: 400px;
+}
+
+.practice-zh {
+  width: 208px;
+  text-align: right;
+}
+
+.company-contact-list {
+  margin-top: 30px;
+}
+
+.company-contact-item + .company-contact-item {
+  margin-top: 8px;
+}
+
+.company-contact-label {
+  font-size: 35px;
+  font-weight: 500;
+  line-height: 70px;
+  letter-spacing: 3.5px;
+}
+
+.company-contact-value {
+  display: block;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 30px;
+  letter-spacing: 6px;
+}

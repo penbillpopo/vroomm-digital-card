@@ -1,0 +1,72 @@
+- main "VROOMM 電子名片" [ref=e3]:
+  - generic [ref=e6]:
+    - region "電子名片封面" [ref=e7]:
+      - generic [ref=e9]:
+        - heading "VROOMM Visual Consultancy" [level=1] [ref=e10]:
+          - generic [ref=e11]: VROOMM
+          - generic [ref=e12]: Visual Consultancy
+        - paragraph [ref=e13]: Visual Consultancy. We shape how brands are seen, understood and chosen.
+      - figure [ref=e14]:
+        - img "Portrait of Elly Lin" [ref=e15]
+      - region "Contact information" [ref=e16]:
+        - generic [ref=e17]:
+          - heading "Elly Lin" [level=2] [ref=e18]
+          - paragraph [ref=e19]: Project Manager
+        - generic [ref=e20]:
+          - paragraph [ref=e21]: "@dragonnn"
+          - paragraph [ref=e22]: IG
+        - link "0934-025-806" [ref=e23] [cursor=pointer]:
+          - /url: tel:+886934025806
+        - link "elly@spidercard.com" [ref=e24] [cursor=pointer]:
+          - /url: mailto:elly@spidercard.com
+        - link "www.vroomm.com" [ref=e25] [cursor=pointer]:
+          - /url: https://www.vroomm.com
+      - button "下一頁" [ref=e26] [cursor=pointer]
+    - region "VROOMM 公司介紹" [ref=e28]:
+      - generic [ref=e30]:
+        - heading "VROOMM.CO" [level=2] [ref=e31]
+        - paragraph [ref=e32]: Visual Consultancy. We shape how brands are seen, understood and chosen.
+      - region [ref=e33]:
+        - heading "VROOMM 是視覺顧問公司" [level=3] [ref=e35]
+        - generic [ref=e37]:
+          - paragraph [ref=e38]: 我們從策略到執行...
+          - paragraph [ref=e39]: 客戶得到的不是零散的設計服務...
+      - region [ref=e40]:
+        - heading "PRACTICE 服務項目" [level=3] [ref=e42]
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - paragraph [ref=e46]: 00 | Visual Consultancy
+            - paragraph [ref=e47]: 視覺顧問
+          - generic [ref=e48]:
+            - paragraph [ref=e49]: 01 | Brand & Identity
+            - paragraph [ref=e50]: 品牌識別
+          - generic [ref=e51]:
+            - paragraph [ref=e52]: 02 | Campaign & Content
+            - paragraph [ref=e53]: 主視覺內容
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: 03 | Image & Motion
+            - paragraph [ref=e56]: 影像動態
+          - generic [ref=e57]:
+            - paragraph [ref=e58]: 04 | Digital & Experience
+            - paragraph [ref=e59]: 數位體驗
+          - generic [ref=e60]:
+            - paragraph [ref=e61]: 05 | Object & Space
+            - paragraph [ref=e62]: 物件空間
+      - region [ref=e63]:
+        - heading "CONTACT 聯絡我們" [level=3] [ref=e65]
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - heading "Instgram" [level=4] [ref=e69]
+            - link "@dragonnn" [ref=e70] [cursor=pointer]:
+              - /url: https://www.instagram.com/dragonnn/
+          - generic [ref=e71]:
+            - heading "Website" [level=4] [ref=e72]
+            - link "www.vroomm.com" [ref=e73] [cursor=pointer]:
+              - /url: https://www.vroomm.com
+          - generic [ref=e74]:
+            - heading "Email" [level=4] [ref=e75]
+            - link "elly@spidercard.com" [ref=e76] [cursor=pointer]:
+              - /url: mailto:elly@spidercard.com
+          - heading "統一編號" [level=4] [ref=e78]
+          - heading "Address" [level=4] [ref=e80]
+      - button "上一頁" [ref=e81] [cursor=pointer]
