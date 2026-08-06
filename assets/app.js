@@ -363,6 +363,7 @@ createApp({
                 <img
                   class="portrait-image"
                   :src="portraitUrl"
+                  referrerpolicy="no-referrer"
                   alt="Portrait of Elly Lin"
                 />
               </figure>
