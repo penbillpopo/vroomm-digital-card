@@ -7,6 +7,7 @@ const TRANSITION_MS = 900;
 const WHEEL_THRESHOLD = 32;
 const SWIPE_THRESHOLD = 80;
 const API_URL_PARAM = "api";
+const CARD_ID_PARAM = "id";
 const DEFAULT_CARD_ID = "elly";
 const DEFAULT_API_BASE_URL =
   "https://script.google.com/macros/s/AKfycbzLCaq7G-PXHKSqVEaQb6-dNpU6ILo4NzAE-KB69WxHzrgU5FwBazHVTwbQqmVUEHWr/exec";
@@ -18,7 +19,13 @@ function isUsableUrl(value) {
 function resolveApiUrl() {
   const url = new URL(window.location.href);
   const queryValue = url.searchParams.get(API_URL_PARAM);
-  return queryValue || `${DEFAULT_API_BASE_URL}?id=${DEFAULT_CARD_ID}`;
+  const cardId = url.searchParams.get(CARD_ID_PARAM) || DEFAULT_CARD_ID;
+
+  if (queryValue) {
+    return appendUrlParam(queryValue, CARD_ID_PARAM, cardId);
+  }
+
+  return `${DEFAULT_API_BASE_URL}?id=${encodeURIComponent(cardId)}`;
 }
 
 function appendUrlParam(urlString, key, value) {
