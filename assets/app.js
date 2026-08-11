@@ -6,23 +6,27 @@ const SLIDE_COUNT = 2;
 const TRANSITION_MS = 900;
 const WHEEL_THRESHOLD = 32;
 const SWIPE_THRESHOLD = 80;
-const API_URL_PARAM = "api";
-const CARD_ID_PARAM = "id";
-const DEFAULT_CARD_ID = "elly";
+const API_URL_PARAM = 'api';
+const CARD_ID_PARAM = 'id';
+const DEFAULT_CARD_ID = 'elly';
 const DEFAULT_API_BASE_URL =
-  "https://script.google.com/macros/s/AKfycbzLCaq7G-PXHKSqVEaQb6-dNpU6ILo4NzAE-KB69WxHzrgU5FwBazHVTwbQqmVUEHWr/exec";
+  'https://script.google.com/macros/s/AKfycbw36PdOiGAqiQbCyO166UTsdDhJfUiSFXmrQeSsVxkIzT2o-gSzjz_3ex4cmrxSOaGG/exec';
 const ABOUT_ACCORDION_TEXT =
-  "VROOMM 是一家以品牌視覺治理為核心的Visual Consultancy。我們從品牌策略與商業目標出發，全盤統籌視覺識別、內容溝通、數位體驗、空間與產品等品牌接觸點，建立一致、可持續發展的品牌視覺系統";
+  'VROOMM 是一家以品牌視覺治理為核心的Visual Consultancy。我們從品牌策略與商業目標出發，全盤統籌視覺識別、內容溝通、數位體驗、空間與產品等品牌接觸點，建立一致、可持續發展的品牌視覺系統';
 const SERVICES_ACCORDION_TEXT = [
-  "品牌策略與治理",
-  "視覺識別與品牌系統",
-  "內容溝通與 Campaign 視覺",
-  "數位體驗與網站介面",
-  "空間與產品接觸點整合",
+  '品牌策略與治理',
+  '視覺識別與品牌系統',
+  '內容溝通與 Campaign 視覺',
+  '數位體驗與網站介面',
+  '空間與產品接觸點整合',
 ];
 
 function isUsableUrl(value) {
-  return typeof value === "string" && /^https?:\/\//.test(value) && !value.includes("...");
+  return (
+    typeof value === 'string' &&
+    /^https?:\/\//.test(value) &&
+    !value.includes('...')
+  );
 }
 
 function resolveApiUrl() {
@@ -44,67 +48,67 @@ function appendUrlParam(urlString, key, value) {
 }
 
 function formatPhone(value) {
-  const digits = String(value || "").replace(/\D/g, "");
+  const digits = String(value || '').replace(/\D/g, '');
 
-  if (digits.startsWith("09") && digits.length === 10) {
+  if (digits.startsWith('09') && digits.length === 10) {
     return `${digits.slice(0, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
   }
 
-  if (digits.startsWith("8869") && digits.length === 12) {
+  if (digits.startsWith('8869') && digits.length === 12) {
     return `0${digits.slice(3, 6)}-${digits.slice(6, 9)}-${digits.slice(9)}`;
   }
 
-  if (digits.startsWith("886") && digits.length === 11) {
+  if (digits.startsWith('886') && digits.length === 11) {
     return `0${digits.slice(3, 5)}-${digits.slice(5, 8)}-${digits.slice(8)}`;
   }
 
-  return value || "";
+  return value || '';
 }
 
 function toTelPhone(value) {
-  const digits = String(value || "").replace(/\D/g, "");
+  const digits = String(value || '').replace(/\D/g, '');
 
-  if (digits.startsWith("09") && digits.length === 10) {
+  if (digits.startsWith('09') && digits.length === 10) {
     return `+886${digits.slice(1)}`;
   }
 
-  if (digits.startsWith("886") && digits.length >= 11) {
+  if (digits.startsWith('886') && digits.length >= 11) {
     return `+${digits}`;
   }
 
-  return value || "";
+  return value || '';
 }
 
 function resolveInstagramUrl(handle, explicitUrl) {
-  const url = String(explicitUrl || "").trim();
+  const url = String(explicitUrl || '').trim();
   if (/^https?:\/\//.test(url)) {
     return url;
   }
 
-  const instagram = String(handle || "").trim();
+  const instagram = String(handle || '').trim();
   if (!instagram) {
-    return "";
+    return '';
   }
 
-  return `https://www.instagram.com/${instagram.replace(/^@/, "")}/`;
+  return `https://www.instagram.com/${instagram.replace(/^@/, '')}/`;
 }
 
 function resolveRecordValue(record, keys) {
   for (const key of keys) {
     const value = record[key];
-    if (typeof value === "string" && value.trim()) {
+    if (typeof value === 'string' && value.trim()) {
       return value.trim();
     }
   }
 
-  return "";
+  return '';
 }
 
 function buildDynamicPractices(record, fallbackItems) {
   const rawValue = resolveRecordValue(record, [
-    "practices",
-    "practiceList",
-    "practice",
+    'practices',
+    'practiceList',
+    'practice',
   ]);
 
   if (!rawValue) {
@@ -112,11 +116,11 @@ function buildDynamicPractices(record, fallbackItems) {
   }
 
   const practiceList = rawValue
-    .split(";")
+    .split(';')
     .map((item) => item.trim())
     .filter(Boolean)
     .map((item) => {
-      const [en = "", zh = ""] = item.split(",").map((part) => part.trim());
+      const [en = '', zh = ''] = item.split(',').map((part) => part.trim());
       return { en, zh };
     })
     .filter((item) => item.en || item.zh);
@@ -125,7 +129,7 @@ function buildDynamicPractices(record, fallbackItems) {
 }
 
 function buildServiceList(value, fallbackItems) {
-  const services = String(value || "")
+  const services = String(value || '')
     .split(/\r?\n|;/)
     .map((item) => item.trim())
     .filter(Boolean);
@@ -136,14 +140,15 @@ function buildServiceList(value, fallbackItems) {
 function normalizeApiPayload(payload) {
   const source = Array.isArray(payload) ? payload[0] : payload;
 
-  if (!source || typeof source !== "object") {
+  if (!source || typeof source !== 'object') {
     return { card: {}, common: {} };
   }
 
-  if ("card" in source || "common" in source) {
+  if ('card' in source || 'common' in source) {
     return {
-      card: source.card && typeof source.card === "object" ? source.card : {},
-      common: source.common && typeof source.common === "object" ? source.common : {},
+      card: source.card && typeof source.card === 'object' ? source.card : {},
+      common:
+        source.common && typeof source.common === 'object' ? source.common : {},
     };
   }
 
@@ -163,64 +168,64 @@ createApp({
       isLoading: true,
       touchStartY: 0,
       touchEndY: 0,
-      portraitUrl: "",
-      activeAccordion: "about",
+      portraitUrl: '',
+      activeAccordion: 'about',
       aboutAccordionText: ABOUT_ACCORDION_TEXT,
       servicesAccordionText: SERVICES_ACCORDION_TEXT,
-      bookingUrl: "",
-      commonBrandName: "VROOMM",
-      commonInstagram: "",
-      commonInstagramUrl: "",
-      commonEmail: "",
-      commonWebsite: "",
-      commonUnifiedNumber: "",
+      bookingUrl: '',
+      commonBrandName: 'VROOMM',
+      commonInstagram: '',
+      commonInstagramUrl: '',
+      commonEmail: '',
+      commonWebsite: '',
+      commonUnifiedNumber: '',
       person: {
-        name: "",
-        title: "",
-        instagram: "",
-        igUrl: "",
-        phone: "",
-        email: "",
-        website: "",
+        name: '',
+        title: '',
+        instagram: '',
+        igUrl: '',
+        phone: '',
+        email: '',
+        website: '',
       },
       company: {
-        title: "",
-        subtitle: "",
-        introHeading: "VROOMM 是視覺顧問公司",
+        title: '',
+        subtitle: '',
+        introHeading: 'VROOMM 是視覺顧問公司',
         introParagraphs: [],
-        practiceHeading: "PRACTICE 服務項目",
+        practiceHeading: 'PRACTICE 服務項目',
         practices: [
-          { en: "00 | Visual Consultancy", zh: "視覺顧問" },
-          { en: "01 | Brand & Identity", zh: "品牌識別" },
-          { en: "02 | Campaign & Content", zh: "主視覺內容" },
-          { en: "03 | Image & Motion", zh: "影像動態" },
-          { en: "04 | Digital & Experience", zh: "數位體驗" },
-          { en: "05 | Object & Space", zh: "物件空間" },
+          { en: '00 | Visual Consultancy', zh: '視覺顧問' },
+          { en: '01 | Brand & Identity', zh: '品牌識別' },
+          { en: '02 | Campaign & Content', zh: '主視覺內容' },
+          { en: '03 | Image & Motion', zh: '影像動態' },
+          { en: '04 | Digital & Experience', zh: '數位體驗' },
+          { en: '05 | Object & Space', zh: '物件空間' },
         ],
-        contactHeading: "CONTACT 聯絡我們",
+        contactHeading: 'CONTACT 聯絡我們',
         contacts: [
           {
-            label: "Instgram",
-            value: "",
-            href: "",
+            label: 'Instgram',
+            value: '',
+            href: '',
           },
           {
-            label: "Website",
-            value: "",
-            href: "",
+            label: 'Website',
+            value: '',
+            href: '',
           },
           {
-            label: "Email",
-            value: "",
-            href: "",
+            label: 'Email',
+            value: '',
+            href: '',
           },
           {
-            label: "統一編號",
-            value: "",
+            label: '統一編號',
+            value: '',
           },
           {
-            label: "Address",
-            value: "",
+            label: 'Address',
+            value: '',
           },
         ],
       },
@@ -246,27 +251,28 @@ createApp({
   },
   mounted() {
     this.updateScale();
-    window.addEventListener("resize", this.updateScale);
-    window.visualViewport?.addEventListener("resize", this.updateScale);
-    window.addEventListener("wheel", this.handleWheel, { passive: false });
-    window.addEventListener("keydown", this.handleKeydown);
+    window.addEventListener('resize', this.updateScale);
+    window.visualViewport?.addEventListener('resize', this.updateScale);
+    window.addEventListener('wheel', this.handleWheel, { passive: false });
+    window.addEventListener('keydown', this.handleKeydown);
     this.loadCardData();
   },
   beforeUnmount() {
-    window.removeEventListener("resize", this.updateScale);
-    window.visualViewport?.removeEventListener("resize", this.updateScale);
-    window.removeEventListener("wheel", this.handleWheel);
-    window.removeEventListener("keydown", this.handleKeydown);
+    window.removeEventListener('resize', this.updateScale);
+    window.visualViewport?.removeEventListener('resize', this.updateScale);
+    window.removeEventListener('wheel', this.handleWheel);
+    window.removeEventListener('keydown', this.handleKeydown);
   },
   methods: {
     isUsableUrl(value) {
       return isUsableUrl(value);
     },
     updateScale() {
-      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const viewportHeight =
+        window.visualViewport?.height || window.innerHeight;
       document.documentElement.style.setProperty(
-        "--app-height",
-        `${viewportHeight}px`,
+        '--app-height',
+        `${viewportHeight}px`
       );
       this.scale = viewportHeight / DESIGN_HEIGHT;
     },
@@ -287,7 +293,7 @@ createApp({
       this.goToSlide(this.activeSlide + direction);
     },
     toggleAccordion(section) {
-      this.activeAccordion = this.activeAccordion === section ? "" : section;
+      this.activeAccordion = this.activeAccordion === section ? '' : section;
     },
     isAccordionOpen(section) {
       return this.activeAccordion === section;
@@ -302,16 +308,20 @@ createApp({
     },
     handleKeydown(event) {
       if (
-        ["ArrowDown", "PageDown", " ", "ArrowUp", "PageUp"].includes(event.key)
+        ['ArrowDown', 'PageDown', ' ', 'ArrowUp', 'PageUp'].includes(event.key)
       ) {
         event.preventDefault();
       }
 
-      if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " ") {
+      if (
+        event.key === 'ArrowDown' ||
+        event.key === 'PageDown' ||
+        event.key === ' '
+      ) {
         this.stepSlide(1);
       }
 
-      if (event.key === "ArrowUp" || event.key === "PageUp") {
+      if (event.key === 'ArrowUp' || event.key === 'PageUp') {
         this.stepSlide(-1);
       }
     },
@@ -335,75 +345,71 @@ createApp({
     applyCardData(payload) {
       const { card, common } = normalizeApiPayload(payload);
       const unifiedNumber = resolveRecordValue(common, [
-        "unifiedNumber",
-        "taxId",
-        "businessNumber",
-        "companyTaxId",
+        'unifiedNumber',
+        'taxId',
+        'businessNumber',
+        'companyTaxId',
       ]);
-      const aboutText = resolveRecordValue(common, ["aboutText", "about"]);
-      const services = resolveRecordValue(common, ["services", "serviceList"]);
+      const aboutText = resolveRecordValue(common, ['aboutText', 'about']);
+      const services = resolveRecordValue(common, ['services', 'serviceList']);
       const commonWebsite = resolveRecordValue(common, [
-        "website",
-        "companyWebsite",
+        'website',
+        'companyWebsite',
       ]);
-      const commonEmail = resolveRecordValue(common, [
-        "email",
-        "companyEmail",
-      ]);
+      const commonEmail = resolveRecordValue(common, ['email', 'companyEmail']);
       const commonInstagram = resolveRecordValue(common, [
-        "instagram",
-        "companyInstagram",
+        'instagram',
+        'companyInstagram',
       ]);
       const commonInstagramUrl = resolveRecordValue(common, [
-        "igUrl",
-        "instagramUrl",
-        "companyIgUrl",
-        "companyInstagramUrl",
+        'igUrl',
+        'instagramUrl',
+        'companyIgUrl',
+        'companyInstagramUrl',
       ]);
-      const brandName = resolveRecordValue(common, [
-        "brandName",
-        "companyTitle",
-        "title",
-      ]) || "VROOMM";
+      const brandName =
+        resolveRecordValue(common, ['brandName', 'companyTitle', 'title']) ||
+        'VROOMM';
 
       this.aboutAccordionText = aboutText || ABOUT_ACCORDION_TEXT;
       this.servicesAccordionText = buildServiceList(
         services,
-        SERVICES_ACCORDION_TEXT,
+        SERVICES_ACCORDION_TEXT
       );
       this.bookingUrl = resolveRecordValue(common, [
-        "bookingUrl",
-        "bookMeetingUrl",
+        'bookingUrl',
+        'bookMeetingUrl',
       ]);
       this.commonBrandName = brandName;
-      this.commonInstagram = commonInstagram || card.instagram || "";
+      this.commonInstagram = commonInstagram || card.instagram || '';
       this.commonInstagramUrl = resolveInstagramUrl(
-        commonInstagram || card.instagram || "",
-        commonInstagramUrl || resolveRecordValue(card, ["igUrl", "instagramUrl"]),
+        commonInstagram || card.instagram || '',
+        commonInstagramUrl ||
+          resolveRecordValue(card, ['igUrl', 'instagramUrl'])
       );
-      this.commonEmail = commonEmail || card.email || "";
-      this.commonWebsite = commonWebsite || card.website || "";
+      this.commonEmail = commonEmail || card.email || '';
+      this.commonWebsite = commonWebsite || card.website || '';
       this.commonUnifiedNumber =
         unifiedNumber ||
         resolveRecordValue(card, [
-          "unifiedNumber",
-          "taxId",
-          "businessNumber",
-          "companyTaxId",
+          'unifiedNumber',
+          'taxId',
+          'businessNumber',
+          'companyTaxId',
         ]);
 
       this.person = {
         ...this.person,
-        name: card.name || "",
-        title: card.title || "",
-        instagram: card.instagram || "",
+        name: card.name || '',
+        title: card.title || '',
+        instagram: card.instagram || '',
         igUrl: resolveInstagramUrl(
-          card.instagram || "",
-          resolveRecordValue(card, ["igUrl", "instagramUrl"]),
+          card.instagram || '',
+          resolveRecordValue(card, ['igUrl', 'instagramUrl'])
         ),
-        phone: formatPhone(card.phone || ""),
-        email: card.email || "",
-        website: card.website || commonWebsite || "",
+        phone: formatPhone(card.phone || ''),
+        email: card.email || '',
+        website: card.website || commonWebsite || '',
       };
 
       if (isUsableUrl(card.portraitUrl)) {
@@ -413,7 +419,7 @@ createApp({
     loadCardDataJsonp() {
       return new Promise((resolve, reject) => {
         const callbackName = `__vroommCard_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-        const script = document.createElement("script");
+        const script = document.createElement('script');
         const cleanup = () => {
           delete window[callbackName];
           script.remove();
@@ -426,10 +432,10 @@ createApp({
 
         script.onerror = () => {
           cleanup();
-          reject(new Error("JSONP request failed"));
+          reject(new Error('JSONP request failed'));
         };
 
-        script.src = appendUrlParam(this.apiUrl, "callback", callbackName);
+        script.src = appendUrlParam(this.apiUrl, 'callback', callbackName);
         document.body.appendChild(script);
       });
     },
@@ -444,11 +450,11 @@ createApp({
         const source = Array.isArray(payload) ? payload[0] : payload;
 
         if (!source || source.error) {
-          throw new Error(source?.error || "Card data is empty");
+          throw new Error(source?.error || 'Card data is empty');
         }
         this.applyCardData(payload);
       } catch (error) {
-        console.error("Failed to load card data:", error);
+        console.error('Failed to load card data:', error);
       } finally {
         this.isLoading = false;
       }
@@ -672,4 +678,4 @@ createApp({
       </section>
     </main>
   `,
-}).mount("#app");
+}).mount('#app');
