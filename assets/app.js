@@ -7,8 +7,6 @@ const TRANSITION_MS = 900;
 const WHEEL_THRESHOLD = 32;
 const SWIPE_THRESHOLD = 80;
 const API_URL_PARAM = 'api';
-const CARD_ID_PARAM = 'id';
-const DEFAULT_CARD_ID = 'elly';
 const DEFAULT_API_BASE_URL =
   'https://script.google.com/macros/s/AKfycbw36PdOiGAqiQbCyO166UTsdDhJfUiSFXmrQeSsVxkIzT2o-gSzjz_3ex4cmrxSOaGG/exec';
 const ABOUT_ACCORDION_TEXT =
@@ -32,13 +30,30 @@ function isUsableUrl(value) {
 function resolveApiUrl() {
   const url = new URL(window.location.href);
   const queryValue = url.searchParams.get(API_URL_PARAM);
-  const cardId = url.searchParams.get(CARD_ID_PARAM) || DEFAULT_CARD_ID;
+  const cardId = resolveCardIdFromPathname(url.pathname);
+
+  if (!cardId) {
+    return '';
+  }
 
   if (queryValue) {
-    return appendUrlParam(queryValue, CARD_ID_PARAM, cardId);
+    return appendUrlParam(queryValue, 'id', cardId);
   }
 
   return `${DEFAULT_API_BASE_URL}?id=${encodeURIComponent(cardId)}`;
+}
+
+function resolveCardIdFromPathname(pathname) {
+  const normalizedPath = String(pathname || '/')
+    .replace(/^\/+|\/+$/g, '')
+    .trim();
+
+  if (!normalizedPath || normalizedPath === 'index.html') {
+    return '';
+  }
+
+  const [cardId] = normalizedPath.split('/');
+  return decodeURIComponent(cardId || '').trim();
 }
 
 function appendUrlParam(urlString, key, value) {
