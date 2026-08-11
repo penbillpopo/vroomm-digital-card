@@ -11,6 +11,15 @@ const CARD_ID_PARAM = "id";
 const DEFAULT_CARD_ID = "elly";
 const DEFAULT_API_BASE_URL =
   "https://script.google.com/macros/s/AKfycbzLCaq7G-PXHKSqVEaQb6-dNpU6ILo4NzAE-KB69WxHzrgU5FwBazHVTwbQqmVUEHWr/exec";
+const ABOUT_ACCORDION_TEXT =
+  "VROOMM 是一家以品牌視覺治理為核心的Visual Consultancy。我們從品牌策略與商業目標出發，全盤統籌視覺識別、內容溝通、數位體驗、空間與產品等品牌接觸點，建立一致、可持續發展的品牌視覺系統";
+const SERVICES_ACCORDION_TEXT = [
+  "品牌策略與治理",
+  "視覺識別與品牌系統",
+  "內容溝通與 Campaign 視覺",
+  "數位體驗與網站介面",
+  "空間與產品接觸點整合",
+];
 
 function isUsableUrl(value) {
   return typeof value === "string" && /^https?:\/\//.test(value) && !value.includes("...");
@@ -101,6 +110,15 @@ function buildDynamicPractices(record, fallbackItems) {
   return practiceList.length ? practiceList : fallbackItems;
 }
 
+function buildServiceList(value, fallbackItems) {
+  const services = String(value || "")
+    .split(/\r?\n|;/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return services.length ? services : fallbackItems;
+}
+
 createApp({
   data() {
     return {
@@ -112,6 +130,10 @@ createApp({
       touchStartY: 0,
       touchEndY: 0,
       portraitUrl: "",
+      activeAccordion: "about",
+      aboutAccordionText: ABOUT_ACCORDION_TEXT,
+      servicesAccordionText: SERVICES_ACCORDION_TEXT,
+      bookingUrl: "",
       person: {
         name: "",
         title: "",
@@ -196,6 +218,9 @@ createApp({
     window.removeEventListener("keydown", this.handleKeydown);
   },
   methods: {
+    isUsableUrl(value) {
+      return isUsableUrl(value);
+    },
     updateScale() {
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
       document.documentElement.style.setProperty(
@@ -219,6 +244,12 @@ createApp({
     },
     stepSlide(direction) {
       this.goToSlide(this.activeSlide + direction);
+    },
+    toggleAccordion(section) {
+      this.activeAccordion = this.activeAccordion === section ? "" : section;
+    },
+    isAccordionOpen(section) {
+      return this.activeAccordion === section;
     },
     handleWheel(event) {
       if (Math.abs(event.deltaY) < WHEEL_THRESHOLD) {
@@ -271,6 +302,15 @@ createApp({
         "address",
         "companyAddress",
       ]);
+      const aboutText = resolveRecordValue(record, ["aboutText", "about"]);
+      const services = resolveRecordValue(record, ["services", "serviceList"]);
+
+      this.aboutAccordionText = aboutText || ABOUT_ACCORDION_TEXT;
+      this.servicesAccordionText = buildServiceList(
+        services,
+        SERVICES_ACCORDION_TEXT,
+      );
+      this.bookingUrl = resolveRecordValue(record, ["bookingUrl", "bookMeetingUrl"]);
 
       this.person = {
         ...this.person,
@@ -472,68 +512,117 @@ createApp({
             </section>
 
             <section class="panel panel--about" aria-label="VROOMM 公司介紹">
-              <img class="brand-mark" src="./assets/images/vroomm-wordmark.svg" alt="" aria-hidden="true" />
-
-              <header class="about-hero">
-                <h2 class="about-title">{{ company.title }}</h2>
-                <p class="about-subtitle">{{ company.subtitle }}</p>
-              </header>
-
-              <section class="about-section about-section--intro" aria-labelledby="intro-heading">
-                <div class="section-heading">
-                  <h3 id="intro-heading">{{ company.introHeading }}</h3>
-                  <div class="section-rule" aria-hidden="true"></div>
-                </div>
-                <div class="section-copy">
-                  <p v-for="paragraph in company.introParagraphs" :key="paragraph">
-                    {{ paragraph }}
-                  </p>
-                </div>
-              </section>
-
-              <section class="about-section about-section--practice" aria-labelledby="practice-heading">
-                <div class="section-heading">
-                  <h3 id="practice-heading">{{ company.practiceHeading }}</h3>
-                  <div class="section-rule" aria-hidden="true"></div>
-                </div>
-                <div class="practice-grid">
-                  <div class="practice-row" v-for="item in company.practices" :key="item.en">
-                    <p class="practice-en">{{ item.en }}</p>
-                    <p class="practice-zh">{{ item.zh }}</p>
-                  </div>
-                </div>
-              </section>
-
-              <section class="about-section about-section--contact" aria-labelledby="company-contact-heading">
-                <div class="section-heading">
-                  <h3 id="company-contact-heading">{{ company.contactHeading }}</h3>
-                  <div class="section-rule" aria-hidden="true"></div>
-                </div>
-                <div class="company-contact-list">
-                  <div class="company-contact-item" v-for="item in company.contacts" :key="item.label">
-                    <h4 class="company-contact-label">{{ item.label }}</h4>
-                    <a
-                      v-if="item.href && item.value"
-                      class="company-contact-value"
-                      :href="item.href"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {{ item.value }}
-                    </a>
-                    <p v-else-if="item.value" class="company-contact-value">{{ item.value }}</p>
-                  </div>
-                </div>
-              </section>
-
               <button
-                class="slide-arrow slide-arrow--up"
+                class="about-back-button"
                 type="button"
                 aria-label="上一頁"
                 @click="goToSlide(0)"
               >
                 <img src="./assets/images/chevron.svg" alt="" aria-hidden="true" />
               </button>
+
+              <div class="about-page-copy">
+                <h2 class="about-page-title">吾潤視覺顧問公司</h2>
+                <p class="about-page-summary">VROOMM 是視覺顧問公司</p>
+                <p class="about-page-summary">以策略判斷與統一審美，讓品牌的每一次出現</p>
+                <p class="about-page-summary">都成為被選擇的理由</p>
+              </div>
+
+              <section class="accordion-group" aria-label="About sections">
+                <section class="accordion-section" :class="{ 'is-open': isAccordionOpen('about') }">
+                  <button
+                    class="accordion-trigger"
+                    type="button"
+                    :aria-expanded="isAccordionOpen('about') ? 'true' : 'false'"
+                    aria-controls="about-panel"
+                    @click="toggleAccordion('about')"
+                  >
+                    <span class="accordion-title">ABOUT</span>
+                    <img
+                      class="accordion-icon"
+                      :class="{ 'is-open': isAccordionOpen('about') }"
+                      src="./assets/images/chevron.svg"
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                  <div
+                    v-show="isAccordionOpen('about')"
+                    id="about-panel"
+                    class="accordion-panel"
+                  >
+                    <p class="accordion-copy">{{ aboutAccordionText }}</p>
+                  </div>
+                </section>
+
+                <section class="accordion-section" :class="{ 'is-open': isAccordionOpen('services') }">
+                  <button
+                    class="accordion-trigger"
+                    type="button"
+                    :aria-expanded="isAccordionOpen('services') ? 'true' : 'false'"
+                    aria-controls="services-panel"
+                    @click="toggleAccordion('services')"
+                  >
+                    <span class="accordion-title">SERVICES</span>
+                    <img
+                      class="accordion-icon"
+                      :class="{ 'is-open': isAccordionOpen('services') }"
+                      src="./assets/images/chevron.svg"
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                  <div
+                    v-show="isAccordionOpen('services')"
+                    id="services-panel"
+                    class="accordion-panel accordion-panel--services"
+                  >
+                    <p v-for="item in servicesAccordionText" :key="item" class="accordion-copy accordion-copy--service">
+                      {{ item }}
+                    </p>
+                  </div>
+                </section>
+
+                <section class="accordion-section accordion-section--static">
+                  <a
+                    v-if="isUsableUrl(bookingUrl)"
+                    class="accordion-trigger accordion-trigger--static"
+                    :href="bookingUrl"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span class="accordion-title">BOOK A MEETING</span>
+                  </a>
+                  <div v-else class="accordion-trigger accordion-trigger--static">
+                    <span class="accordion-title">BOOK A MEETING</span>
+                  </div>
+                </section>
+              </section>
+
+              <section class="about-footer" aria-label="Company contact summary">
+                <div class="about-footer-row about-footer-row--brand">
+                  <h3 class="about-footer-brand">VROOMM</h3>
+                  <p class="about-footer-meta">Visual Consultancy</p>
+                </div>
+                <div class="about-footer-row">
+                  <p class="about-footer-primary">@vroomm.co</p>
+                  <p class="about-footer-meta">IG</p>
+                </div>
+                <div class="about-footer-row">
+                  <p class="about-footer-primary">000633108</p>
+                  <p class="about-footer-meta">VAT</p>
+                </div>
+                <div class="about-footer-row about-footer-row--stack">
+                  <p class="about-footer-primary">vroomm@vroomm.com</p>
+                </div>
+                <div class="about-footer-row about-footer-row--stack">
+                  <p class="about-footer-primary">www.vroomm.com</p>
+                </div>
+              </section>
+
+              <div class="about-bottom-brand" aria-hidden="true">
+                <img class="about-bottom-wordmark" src="./assets/images/vroomm-wordmark-bottom.svg" alt="" />
+              </div>
             </section>
           </div>
         </div>
