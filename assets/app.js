@@ -677,10 +677,22 @@ createApp({
                   <p class="about-footer-meta">VAT</p>
                 </div>
                 <div class="about-footer-row about-footer-row--stack">
-                  <p class="about-footer-primary">{{ commonEmail }}</p>
+                  <a
+                    class="about-footer-primary"
+                    :href="'mailto:' + commonEmail"
+                  >
+                    {{ commonEmail }}
+                  </a>
                 </div>
                 <div class="about-footer-row about-footer-row--stack">
-                  <p class="about-footer-primary">{{ commonWebsite }}</p>
+                  <a
+                    class="about-footer-primary"
+                    :href="/^https?:\\/\\//.test(commonWebsite) ? commonWebsite : 'https://' + commonWebsite"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {{ commonWebsite }}
+                  </a>
                 </div>
               </section>
 
