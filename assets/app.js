@@ -75,6 +75,20 @@ function toTelPhone(value) {
   return value || "";
 }
 
+function resolveInstagramUrl(handle, explicitUrl) {
+  const url = String(explicitUrl || "").trim();
+  if (/^https?:\/\//.test(url)) {
+    return url;
+  }
+
+  const instagram = String(handle || "").trim();
+  if (!instagram) {
+    return "";
+  }
+
+  return `https://www.instagram.com/${instagram.replace(/^@/, "")}/`;
+}
+
 function resolveRecordValue(record, keys) {
   for (const key of keys) {
     const value = record[key];
@@ -119,6 +133,26 @@ function buildServiceList(value, fallbackItems) {
   return services.length ? services : fallbackItems;
 }
 
+function normalizeApiPayload(payload) {
+  const source = Array.isArray(payload) ? payload[0] : payload;
+
+  if (!source || typeof source !== "object") {
+    return { card: {}, common: {} };
+  }
+
+  if ("card" in source || "common" in source) {
+    return {
+      card: source.card && typeof source.card === "object" ? source.card : {},
+      common: source.common && typeof source.common === "object" ? source.common : {},
+    };
+  }
+
+  return {
+    card: source,
+    common: source,
+  };
+}
+
 createApp({
   data() {
     return {
@@ -134,10 +168,17 @@ createApp({
       aboutAccordionText: ABOUT_ACCORDION_TEXT,
       servicesAccordionText: SERVICES_ACCORDION_TEXT,
       bookingUrl: "",
+      commonBrandName: "VROOMM",
+      commonInstagram: "",
+      commonInstagramUrl: "",
+      commonEmail: "",
+      commonWebsite: "",
+      commonUnifiedNumber: "",
       person: {
         name: "",
         title: "",
         instagram: "",
+        igUrl: "",
         phone: "",
         email: "",
         website: "",
@@ -291,97 +332,82 @@ createApp({
     toTelPhone(value) {
       return toTelPhone(value);
     },
-    applyCardData(record) {
-      const unifiedNumber = resolveRecordValue(record, [
+    applyCardData(payload) {
+      const { card, common } = normalizeApiPayload(payload);
+      const unifiedNumber = resolveRecordValue(common, [
         "unifiedNumber",
         "taxId",
         "businessNumber",
         "companyTaxId",
       ]);
-      const address = resolveRecordValue(record, [
-        "address",
-        "companyAddress",
+      const aboutText = resolveRecordValue(common, ["aboutText", "about"]);
+      const services = resolveRecordValue(common, ["services", "serviceList"]);
+      const commonWebsite = resolveRecordValue(common, [
+        "website",
+        "companyWebsite",
       ]);
-      const aboutText = resolveRecordValue(record, ["aboutText", "about"]);
-      const services = resolveRecordValue(record, ["services", "serviceList"]);
+      const commonEmail = resolveRecordValue(common, [
+        "email",
+        "companyEmail",
+      ]);
+      const commonInstagram = resolveRecordValue(common, [
+        "instagram",
+        "companyInstagram",
+      ]);
+      const commonInstagramUrl = resolveRecordValue(common, [
+        "igUrl",
+        "instagramUrl",
+        "companyIgUrl",
+        "companyInstagramUrl",
+      ]);
+      const brandName = resolveRecordValue(common, [
+        "brandName",
+        "companyTitle",
+        "title",
+      ]) || "VROOMM";
 
       this.aboutAccordionText = aboutText || ABOUT_ACCORDION_TEXT;
       this.servicesAccordionText = buildServiceList(
         services,
         SERVICES_ACCORDION_TEXT,
       );
-      this.bookingUrl = resolveRecordValue(record, ["bookingUrl", "bookMeetingUrl"]);
+      this.bookingUrl = resolveRecordValue(common, [
+        "bookingUrl",
+        "bookMeetingUrl",
+      ]);
+      this.commonBrandName = brandName;
+      this.commonInstagram = commonInstagram || card.instagram || "";
+      this.commonInstagramUrl = resolveInstagramUrl(
+        commonInstagram || card.instagram || "",
+        commonInstagramUrl || resolveRecordValue(card, ["igUrl", "instagramUrl"]),
+      );
+      this.commonEmail = commonEmail || card.email || "";
+      this.commonWebsite = commonWebsite || card.website || "";
+      this.commonUnifiedNumber =
+        unifiedNumber ||
+        resolveRecordValue(card, [
+          "unifiedNumber",
+          "taxId",
+          "businessNumber",
+          "companyTaxId",
+        ]);
 
       this.person = {
         ...this.person,
-        name: record.name || "",
-        title: record.title || "",
-        instagram: record.instagram || "",
-        phone: formatPhone(record.phone || ""),
-        email: record.email || "",
-        website: record.website || "",
+        name: card.name || "",
+        title: card.title || "",
+        instagram: card.instagram || "",
+        igUrl: resolveInstagramUrl(
+          card.instagram || "",
+          resolveRecordValue(card, ["igUrl", "instagramUrl"]),
+        ),
+        phone: formatPhone(card.phone || ""),
+        email: card.email || "",
+        website: card.website || commonWebsite || "",
       };
 
-      this.company = {
-        ...this.company,
-        title: record.companyTitle || "",
-        subtitle: record.companySubtitle || "",
-        practices: buildDynamicPractices(record, this.company.practices),
-        introParagraphs: [record.intro1, record.intro2].filter(Boolean).length
-          ? [record.intro1, record.intro2].filter(Boolean)
-          : [],
-        contacts: this.company.contacts.map((item) => {
-          if (item.label === "Instgram") {
-            const instagram = record.instagram || "";
-            return {
-              ...item,
-              value: instagram,
-              href: instagram ? `https://www.instagram.com/${instagram.replace(/^@/, "")}/` : "",
-            };
-          }
-
-          if (item.label === "Website") {
-            const website = record.website || "";
-            return {
-              ...item,
-              value: website,
-              href: website
-                ? /^https?:\/\//.test(website)
-                  ? website
-                  : `https://${website}`
-                : "",
-            };
-          }
-
-            if (item.label === "Email") {
-              const email = record.email || "";
-              return {
-                ...item,
-                value: email,
-                href: email ? `mailto:${email}` : "",
-              };
-            }
-
-            if (item.label === "統一編號") {
-              return {
-                ...item,
-                value: unifiedNumber,
-              };
-            }
-
-            if (item.label === "Address") {
-              return {
-                ...item,
-                value: address,
-              };
-            }
-
-            return item;
-          }),
-      };
-
-      if (isUsableUrl(record.portraitUrl)) {
-        this.portraitUrl = record.portraitUrl;
+      if (isUsableUrl(card.portraitUrl)) {
+        this.portraitUrl = card.portraitUrl;
       }
     },
     loadCardDataJsonp() {
@@ -415,12 +441,12 @@ createApp({
 
       try {
         const payload = await this.loadCardDataJsonp();
-        const record = Array.isArray(payload) ? payload[0] : payload;
+        const source = Array.isArray(payload) ? payload[0] : payload;
 
-        if (!record || record.error) {
-          throw new Error(record?.error || "Card data is empty");
+        if (!source || source.error) {
+          throw new Error(source?.error || "Card data is empty");
         }
-        this.applyCardData(record);
+        this.applyCardData(payload);
       } catch (error) {
         console.error("Failed to load card data:", error);
       } finally {
@@ -439,7 +465,6 @@ createApp({
         <div v-if="isLoading" class="loading-screen" aria-label="Loading">
           <div class="loading-brand">
             <img class="loading-symbol" src="./assets/images/vroomm-symbol.svg" alt="" aria-hidden="true" />
-            <img class="loading-wordmark" src="./assets/images/vroomm-wordmark.svg" alt="VROOMM" />
           </div>
         </div>
       </transition>
@@ -481,7 +506,16 @@ createApp({
                 </div>
 
                 <div class="contact-row contact-row--social">
-                  <p class="contact-instagram">{{ person.instagram }}</p>
+                  <a
+                    v-if="person.igUrl"
+                    class="contact-instagram"
+                    :href="person.igUrl"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {{ person.instagram }}
+                  </a>
+                  <p v-else class="contact-instagram">{{ person.instagram }}</p>
                   <p class="contact-label">IG</p>
                 </div>
 
@@ -601,22 +635,31 @@ createApp({
 
               <section class="about-footer" aria-label="Company contact summary">
                 <div class="about-footer-row about-footer-row--brand">
-                  <h3 class="about-footer-brand">VROOMM</h3>
+                  <h3 class="about-footer-brand">{{ commonBrandName }}</h3>
                   <p class="about-footer-meta">Visual Consultancy</p>
                 </div>
                 <div class="about-footer-row">
-                  <p class="about-footer-primary">@vroomm.co</p>
+                  <a
+                    v-if="commonInstagramUrl"
+                    class="about-footer-primary"
+                    :href="commonInstagramUrl"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {{ commonInstagram }}
+                  </a>
+                  <p v-else class="about-footer-primary">{{ commonInstagram }}</p>
                   <p class="about-footer-meta">IG</p>
                 </div>
                 <div class="about-footer-row">
-                  <p class="about-footer-primary">000633108</p>
+                  <p class="about-footer-primary">{{ commonUnifiedNumber }}</p>
                   <p class="about-footer-meta">VAT</p>
                 </div>
                 <div class="about-footer-row about-footer-row--stack">
-                  <p class="about-footer-primary">vroomm@vroomm.com</p>
+                  <p class="about-footer-primary">{{ commonEmail }}</p>
                 </div>
                 <div class="about-footer-row about-footer-row--stack">
-                  <p class="about-footer-primary">www.vroomm.com</p>
+                  <p class="about-footer-primary">{{ commonWebsite }}</p>
                 </div>
               </section>
 

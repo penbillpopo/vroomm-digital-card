@@ -99,21 +99,14 @@ figure {
 
 .loading-brand {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 52px;
+  justify-content: center;
   width: min(74vw, 760px);
 }
 
 .loading-symbol {
   display: block;
   width: 100%;
-  height: auto;
-}
-
-.loading-wordmark {
-  display: block;
-  width: min(52vw, 360px);
   height: auto;
 }
 
