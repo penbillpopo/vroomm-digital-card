@@ -290,6 +290,10 @@ createApp({
         `${viewportHeight}px`
       );
       this.scale = viewportHeight / DESIGN_HEIGHT;
+      document.documentElement.style.setProperty(
+        '--stage-scale',
+        `${this.scale}`
+      );
     },
     goToSlide(nextSlide) {
       const targetSlide = Math.max(0, Math.min(SLIDE_COUNT - 1, nextSlide));
