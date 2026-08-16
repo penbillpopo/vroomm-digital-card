@@ -75,16 +75,14 @@ figure {
 .page-shell {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 100vw;
-  min-height: 100vh;
   min-height: var(--app-height);
-  height: 100vh;
-  height: 100dvh;
+  height: var(--app-height);
   background: var(--page-bg);
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: none;
 }
 
 .loading-screen {

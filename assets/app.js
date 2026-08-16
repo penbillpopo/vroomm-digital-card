@@ -180,6 +180,7 @@ createApp({
       scale: 1,
       activeSlide: 0,
       isAnimating: false,
+      animationTimer: null,
       isLoading: true,
       touchStartY: 0,
       touchEndY: 0,
@@ -268,6 +269,9 @@ createApp({
     this.updateScale();
     window.addEventListener('resize', this.updateScale);
     window.visualViewport?.addEventListener('resize', this.updateScale);
+    window.visualViewport?.addEventListener('scroll', this.updateScale, {
+      passive: true,
+    });
     window.addEventListener('wheel', this.handleWheel, { passive: false });
     window.addEventListener('keydown', this.handleKeydown);
     this.loadCardData();
@@ -275,8 +279,10 @@ createApp({
   beforeUnmount() {
     window.removeEventListener('resize', this.updateScale);
     window.visualViewport?.removeEventListener('resize', this.updateScale);
+    window.visualViewport?.removeEventListener('scroll', this.updateScale);
     window.removeEventListener('wheel', this.handleWheel);
     window.removeEventListener('keydown', this.handleKeydown);
+    window.clearTimeout(this.animationTimer);
   },
   methods: {
     isUsableUrl(value) {
@@ -297,15 +303,17 @@ createApp({
     },
     goToSlide(nextSlide) {
       const targetSlide = Math.max(0, Math.min(SLIDE_COUNT - 1, nextSlide));
-      if (targetSlide === this.activeSlide || this.isAnimating) {
+      if (targetSlide === this.activeSlide) {
         return;
       }
 
       this.activeSlide = targetSlide;
       this.isAnimating = true;
 
-      window.setTimeout(() => {
+      window.clearTimeout(this.animationTimer);
+      this.animationTimer = window.setTimeout(() => {
         this.isAnimating = false;
+        this.animationTimer = null;
       }, TRANSITION_MS);
     },
     stepSlide(direction) {
@@ -357,6 +365,10 @@ createApp({
       }
 
       this.stepSlide(deltaY > 0 ? 1 : -1);
+    },
+    handleTouchCancel() {
+      this.touchStartY = 0;
+      this.touchEndY = 0;
     },
     toTelPhone(value) {
       return toTelPhone(value);
@@ -482,6 +494,7 @@ createApp({
       aria-label="VROOMM 電子名片"
       @touchstart="handleTouchStart"
       @touchend="handleTouchEnd"
+      @touchcancel="handleTouchCancel"
     >
       <transition name="loader-fade">
         <div v-if="isLoading" class="loading-screen" aria-label="Loading">
