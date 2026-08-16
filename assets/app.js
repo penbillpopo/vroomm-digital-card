@@ -395,10 +395,7 @@ createApp({
         services,
         SERVICES_ACCORDION_TEXT
       );
-      this.bookingUrl = resolveRecordValue(common, [
-        'bookingUrl',
-        'bookMeetingUrl',
-      ]);
+      this.bookingUrl = resolveRecordValue(common, ['bookingUrl']);
       this.commonBrandName = brandName;
       this.commonInstagram = commonInstagram || card.instagram || '';
       this.commonInstagramUrl = resolveInstagramUrl(
@@ -644,17 +641,11 @@ createApp({
 
                 <section class="accordion-section accordion-section--static">
                   <a
-                    v-if="isUsableUrl(bookingUrl)"
                     class="accordion-trigger accordion-trigger--static"
-                    :href="bookingUrl"
-                    target="_blank"
-                    rel="noreferrer"
+                    :href="'mailto:' + bookingUrl.trim()"
                   >
                     <span class="accordion-title">BOOK A MEETING</span>
                   </a>
-                  <div v-else class="accordion-trigger accordion-trigger--static">
-                    <span class="accordion-title">BOOK A MEETING</span>
-                  </div>
                 </section>
               </section>
 

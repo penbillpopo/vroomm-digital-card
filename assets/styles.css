@@ -157,9 +157,9 @@ figure {
 .brand-symbol {
   position: absolute;
   top: 58px;
-  left: 95px;
-  width: 990px;
-  height: 427px;
+  left: 190px;
+  width: 800px;
+  height: auto;
   display: block;
 }
 
@@ -249,12 +249,10 @@ figure {
 .contact-role {
   position: absolute;
   top: 25px;
-  left: 573px;
-  width: 227px;
+  right: 0;
   font-size: 32px;
   font-weight: 300;
   line-height: 36px;
-  white-space: nowrap;
 }
 
 .contact-instagram {
@@ -325,7 +323,7 @@ figure {
 .about-back-button {
   position: absolute;
   top: 107px;
-  left: 617px;
+  left: 564px;
   width: 52px;
   height: 28px;
   display: flex;
@@ -401,19 +399,11 @@ figure {
 .accordion-icon {
   width: 52px;
   height: 28px;
-  margin-top: 36px;
-}
-
-.accordion-section:first-child .accordion-icon {
-  margin-top: 67px;
+  align-self: center;
 }
 
 .accordion-section:not(:first-child) .accordion-trigger {
   padding-top: 18px;
-}
-
-.accordion-section:not(:first-child) .accordion-icon {
-  margin-top: 36px;
 }
 
 .accordion-icon.is-open {
@@ -422,7 +412,7 @@ figure {
 
 .accordion-panel {
   min-height: 200px;
-  padding: 27px 170px 9px;
+  padding: 27px 170px 31px;
 }
 
 .accordion-panel--services {
